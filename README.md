@@ -4,6 +4,8 @@
 
 > 把麦当劳积分从「躺着过期」，变成「算着花掉」。
 
+**在线体验（免安装，打开即算）：** https://seven070707.github.io/mcd-points-hunter/
+
 `mcd-points-hunter` 是一个基于**麦当劳中国 MCP** 的 WorkBuddy Skill。
 它不帮你点餐，它帮你做一件更值钱的事：**把积分当作资产来管**。
 

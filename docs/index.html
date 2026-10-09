@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>麦麦积分猎人 · 在线计算器</title>
+<meta name="description" content="用数学期望管理麦当劳积分资产：到期止损、商城每积分价值排序、抽奖期望值与投入产出比。无需安装，打开即算。">
+<style>
+  :root {
+    --bg: #12100E;
+    --card: #1B1815;
+    --card2: #232019;
+    --border: #302B24;
+    --text: #F5F2EE;
+    --muted: #A8A29E;
+    --dim: #78716C;
+    --yellow: #FFC72C;
+    --red: #DA291C;
+    --green: #4ADE80;
+    --blue: #60A5FA;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 56px; }
+
+  header { padding: 8px 0 28px; }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--yellow);
+    border: 1px solid rgba(255,199,44,.35);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 0 0 8px; font-weight: 500; letter-spacing: -.01em; }
+  h1 .en { display: block; font-size: 14px; color: var(--yellow); font-weight: 400; letter-spacing: .04em; margin-top: 6px; }
+  .lede { color: var(--muted); margin: 0 0 18px; }
+  .star-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--yellow); color: #1A1408;
+    text-decoration: none; font-weight: 500; font-size: 14px;
+    padding: 10px 18px; border-radius: 999px;
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .star-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+  .star-btn .ico { font-size: 15px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 17px; font-weight: 500; margin: 0 0 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tag {
+    font-size: 10px; letter-spacing: .06em; font-weight: 500;
+    padding: 2px 7px; border-radius: 5px;
+    background: rgba(255,199,44,.15); color: var(--yellow);
+  }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+  label.f { display: block; }
+  label.f span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  input[type=number], input[type=date], input[type=text] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    padding: 9px 11px;
+    font-size: 14px;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  input:focus { outline: none; border-color: rgba(255,199,44,.6); }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .prize-head, .prize-row {
+    display: grid;
+    grid-template-columns: 1fr 88px 88px 32px;
+    gap: 8px;
+    align-items: center;
+  }
+  .prize-head { font-size: 11px; color: var(--dim); padding: 0 2px 6px; }
+  .prize-row { margin-bottom: 8px; }
+  .prize-row input { padding: 7px 9px; font-size: 13px; }
+  .del {
+    background: transparent; border: 1px solid var(--border); color: var(--dim);
+    border-radius: 7px; width: 32px; height: 32px; cursor: pointer; font-size: 15px; line-height: 1;
+    font-family: inherit;
+  }
+  .del:hover { color: var(--red); border-color: rgba(218,41,28,.5); }
+  .ghost {
+    background: transparent; border: 1px dashed var(--border); color: var(--muted);
+    border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-family: inherit;
+    margin-top: 4px;
+  }
+  .ghost:hover { color: var(--text); border-color: var(--dim); }
+
+  .verdict {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    padding: 16px 18px; border-radius: 13px; margin: 20px 0 16px;
+    background: var(--card2); border: 1px solid var(--border);
+  }
+  .verdict .big { font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+  .verdict .unit { font-size: 13px; color: var(--muted); }
+  .verdict .pill {
+    font-size: 12px; font-weight: 500; padding: 4px 11px; border-radius: 999px; margin-left: auto;
+  }
+  .pill.bad { background: rgba(218,41,28,.16); color: #FF7A6E; }
+  .pill.mid { background: rgba(255,199,44,.16); color: var(--yellow); }
+  .pill.good { background: rgba(74,222,128,.14); color: var(--green); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--card2); border: 1px solid var(--border); border-radius: 11px; padding: 12px 13px; }
+  .stat .k { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .stat .v { font-size: 19px; font-weight: 500; letter-spacing: -.01em; }
+
+  .stress {
+    border-left: 2px solid var(--red);
+    background: rgba(218,41,28,.07);
+    border-radius: 0 10px 10px 0;
+    padding: 13px 15px;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .stress b { color: #FF7A6E; }
+
+  .eq { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--dim); }
+  .calc { font-size: 12px; color: var(--dim); margin-top: 12px; line-height: 1.7; }
+
+  .lvl { display: inline-block; font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+  .lvl.expired, .lvl.critical { background: rgba(218,41,28,.16); color: #FF7A6E; }
+  .lvl.warning { background: rgba(255,199,44,.16); color: var(--yellow); }
+  .lvl.watch { background: rgba(96,165,250,.14); color: var(--blue); }
+  .lvl.safe { background: rgba(74,222,128,.14); color: var(--green); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+  th { text-align: left; font-size: 11px; color: var(--dim); font-weight: 400; padding: 0 8px 7px; }
+  td { padding: 9px 8px; border-top: 1px solid var(--border); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.best td { background: rgba(74,222,128,.07); }
+  tr.worst td { background: rgba(218,41,28,.06); }
+  .rank { font-size: 11px; color: var(--dim); width: 22px; }
+
+  .advice { margin: 14px 0 0; padding: 0; list-style: none; }
+  .advice li { position: relative; padding-left: 16px; margin-bottom: 7px; font-size: 13.5px; color: var(--muted); }
+  .advice li::before { content: "▸"; position: absolute; left: 0; color: var(--yellow); font-size: 11px; top: 2px; }
+
+  .copy {
+    width: 100%; margin-top: 14px;
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    border-radius: 11px; padding: 11px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .copy:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  footer { color: var(--dim); font-size: 12px; text-align: center; padding-top: 24px; line-height: 1.9; }
+  footer a { color: var(--muted); }
+  .note { font-size: 11.5px; color: var(--dim); margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">麦当劳中国 · 开发者创新挑战</div>
+    <h1>麦麦积分猎人<span class="en">mcd-points-hunter</span></h1>
+    <p class="lede">用数学期望，把麦当劳积分变成可决策的资产。算清三件事：积分会不会白过期、商城换什么最划算、抽奖到底该不该抽。</p>
+    <a class="star-btn" href="https://github.com/seven070707/mcd-points-hunter" target="_blank" rel="noopener">
+      <span class="ico">★</span> 在 GitHub 上 Star 支持
+    </a>
+  </header>
+
+  <section class="card">
+    <h2>抽奖期望值计算器 <span class="tag">核心</span></h2>
+    <p class="sub">活动页只给你一张奖品清单，从不告诉你期望收益 —— 因为算出来通常不好看。改下面的数字，结果实时更新。</p>
+
+    <div class="grid">
+      <label class="f"><span>单抽消耗积分</span><input type="number" id="cost" value="100" min="0"></label>
+      <label class="f"><span>当前可用积分</span><input type="number" id="balance" value="5000" min="0"></label>
+      <label class="f"><span>免费抽奖次数</span><input type="number" id="free" value="0" min="0"></label>
+      <label class="f"><span>商城最优每 1000 积分价值（元）</span><input type="number" id="basis" value="31.9" min="0" step="0.1"></label>
+    </div>
+
+    <div style="margin-top:18px">
+      <div class="prize-head">
+        <div>奖品</div><div style="text-align:right">价值(元)</div><div style="text-align:right">概率(%)</div><div></div>
+      </div>
+      <div id="prizes"></div>
+      <button class="ghost" id="addPrize">+ 添加奖品</button>
+    </div>
+
+    <div class="verdict">
+      <div>
+        <div class="big" id="roi">—</div>
+        <div class="unit">投入产出比（相对商城最优兑换）</div>
+      </div>
+      <div class="pill mid" id="stance">—</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">单次期望收益</div><div class="v" id="ev">—</div></div>
+      <div class="stat"><div class="k">每 1000 积分期望</div><div class="v" id="per1000">—</div></div>
+      <div class="stat"><div class="k">商城基准（每 1000）</div><div class="v" id="base1000">—</div></div>
+    </div>
+
+    <div class="stress" id="stress" style="display:none"></div>
+    <ul class="advice" id="advice"></ul>
+    <div class="calc eq" id="formula"></div>
+    <button class="copy" id="copyBtn">复制结论，发给朋友</button>
+  </section>
+
+  <section class="card">
+    <h2>积分到期体检</h2>
+    <p class="sub">把「还剩 1200 分」翻译成「每天至少要花掉 200 分」，才知道该不该慌。</p>
+    <div class="grid">
+      <label class="f"><span>临期积分数量</span><input type="number" id="expPoints" value="1200" min="0"></label>
+      <label class="f"><span>最早到期日</span><input type="date" id="expDate"></label>
+    </div>
+    <div class="verdict" style="margin-top:18px">
+      <div>
+        <div class="big" id="daysLeft">—</div>
+        <div class="unit">天后过期</div>
+      </div>
+      <div class="pill mid" id="riskLabel">—</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">每天至少消耗</div><div class="v" id="dailyQuota">—</div></div>
+      <div class="stat"><div class="k">到期损失（按基准折算）</div><div class="v" id="lossValue">—</div></div>
+      <div class="stat"><div class="k">风险等级</div><div class="v" id="riskShort">—</div></div>
+    </div>
+    <ul class="advice" id="expAdvice"></ul>
+  </section>
+
+  <section class="card">
+    <h2>商城划算度排序</h2>
+    <p class="sub">商城按「积分价」排列，恰好掩盖了性价比差异。按每积分价值重排，一眼看出哪个在薅你。</p>
+    <div style="margin-top:6px">
+      <div class="prize-head">
+        <div>商品</div><div style="text-align:right">消耗积分</div><div style="text-align:right">权益面值</div><div></div>
+      </div>
+      <div id="products"></div>
+      <button class="ghost" id="addProduct">+ 添加商品</button>
+    </div>
+    <div class="verdict" style="margin-top:18px">
+      <div>
+        <div class="big" id="spread">—</div>
+        <div class="unit">倍 · 同批商品单位积分价值极差</div>
+      </div>
+    </div>
+    <table id="mallTable">
+      <thead><tr><th class="rank"></th><th>商品</th><th class="num">积分</th><th class="num">每 1000 积分</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <ul class="advice" id="mallAdvice"></ul>
+  </section>
+
+  <footer>
+    所有计算在浏览器本地完成，不上传任何数据 · 参数可自由修改<br>
+    <a href="https://github.com/seven070707/mcd-points-hunter" target="_blank" rel="noopener">github.com/seven070707/mcd-points-hunter</a>
+    <div class="note">本页为算法演示版，数据为示例值。完整版通过麦当劳中国 MCP 读取真实账户、商城与抽奖活动数据。</div>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var MC_TRIALS = 20000;
+  var MC_SEED = 42;
+
+  /* 固定种子的伪随机数发生器，保证模拟结果可复现 */
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), 1 | t);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function num(el, fallback) {
+    var v = parseFloat(el.value);
+    return isFinite(v) ? v : (fallback || 0);
+  }
+
+  function money(v) { return v.toFixed(2); }
+
+  /* ---------- 抽奖期望值 ---------- */
+
+  function readPrizes() {
+    var rows = document.querySelectorAll("#prizes .prize-row");
+    var out = [];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var name = r.querySelector(".p-name").value || "未命名奖品";
+      var value = Math.max(0, parseFloat(r.querySelector(".p-value").value) || 0);
+      var prob = Math.max(0, parseFloat(r.querySelector(".p-prob").value) || 0);
+      out.push({ name: name, value: value, prob: prob });
+    }
+    return out;
+  }
+
+  function simulate(prizes, draws, paidDraws, oppCostPerDraw) {
+    if (draws <= 0) return null;
+
+    var trials = MC_TRIALS;
+    var cappedDraws = draws;
+    /* 控制总迭代量，避免大额输入时卡死浏览器 */
+    while (cappedDraws * trials > 6000000) trials = Math.floor(trials / 2);
+    if (trials < 500) trials = 500;
+
+    var cum = [], acc = 0, i;
+    for (i = 0; i < prizes.length; i++) { acc += prizes[i].prob; cum.push(acc); }
+    if (acc <= 0) return null;
+    for (i = 0; i < cum.length; i++) cum[i] = cum[i] / acc;
+
+    var rng = mulberry32(MC_SEED);
+    var totalCost = oppCostPerDraw * paidDraws;
+    var nets = [], grandHits = 0;
+    var maxValue = 0;
+    for (i = 0; i < prizes.length; i++) maxValue = Math.max(maxValue, prizes[i].value);
+    var grandThreshold = maxValue * 0.8;
+
+    function drawOnce() {
+      var r = rng();
+      var lo = 0, hi = cum.length - 1;
+      while (lo < hi) { var mid = (lo + hi) >> 1; if (r <= cum[mid]) hi = mid; else lo = mid + 1; }
+      return lo;
+    }
+
+    for (var t = 0; t < trials; t++) {
+      var gain = 0, grand = false;
+      for (var d = 0; d < cappedDraws; d++) {
+        var idx = drawOnce();
+        gain += prizes[idx].value;
+        if (prizes[idx].value >= grandThreshold && prizes[idx].value > 0) grand = true;
+      }
+      nets.push(gain - totalCost);
+      if (grand) grandHits++;
+    }
+
+    nets.sort(function (a, b) { return a - b; });
+    var n = nets.length;
+    var losses = 0;
+    for (i = 0; i < n; i++) if (nets[i] < -1e-9) losses++;
+
+    return {
+      trials: trials,
+      draws: cappedDraws,
+      medianNet: nets[Math.floor(n / 2)],
+      meanNet: nets.reduce(function (s, v) { return s + v; }, 0) / n,
+      lossProbability: losses / n,
+      grandHitProbability: grandHits / trials,
+      totalCost: totalCost
+    };
+  }
+
+  function calcLottery() {
+    var costPoints = num(document.getElementById("cost"));
+    var balance = num(document.getElementById("balance"));
+    var freeDraws = num(document.getElementById("free"));
+    var basis1000 = num(document.getElementById("basis"));
+    var pointValue = basis1000 / 1000;
+
+    var prizes = readPrizes();
+    var probSum = 0, evPerDraw = 0, i;
+    for (i = 0; i < prizes.length; i++) probSum += prizes[i].prob;
+    if (probSum <= 0) return;
+
+    for (i = 0; i < prizes.length; i++) {
+      evPerDraw += (prizes[i].prob / probSum) * prizes[i].value;
+    }
+
+    var valuePerPoint = costPoints > 0 ? evPerDraw / costPoints : null;
+    var roi = (costPoints > 0 && pointValue > 0) ? valuePerPoint / pointValue : null;
+
+    var capacity = costPoints > 0 ? Math.floor(balance / costPoints) : 0;
+    var recommendedPaid = 0, stanceKey, stanceText;
+    if (costPoints <= 0) { recommendedPaid = capacity; stanceKey = "good"; stanceText = "零成本 · 抽"; }
+    else if (roi === null) { stanceKey = "mid"; stanceText = "缺少基准"; }
+    else if (roi >= 1.2) { recommendedPaid = capacity; stanceKey = "good"; stanceText = "值得投入"; }
+    else if (roi >= 1.0) { recommendedPaid = Math.floor(capacity / 2); stanceKey = "mid"; stanceText = "可以试探（半仓）"; }
+    else { recommendedPaid = 0; stanceKey = "bad"; stanceText = "不建议付费抽"; }
+
+    /* 界面输出 */
+    document.getElementById("roi").textContent = roi === null ? "—" : roi.toFixed(3);
+    var stanceEl = document.getElementById("stance");
+    stanceEl.textContent = stanceText;
+    stanceEl.className = "pill " + (stanceKey === "good" ? "good" : stanceKey === "bad" ? "bad" : "mid");
+
+    document.getElementById("ev").textContent = money(evPerDraw) + " 元";
+    document.getElementById("per1000").textContent = valuePerPoint === null ? "—" : money(valuePerPoint * 1000) + " 元";
+    document.getElementById("base1000").textContent = basis1000 > 0 ? money(basis1000) + " 元" : "—";
+
+    var oppCostPerDraw = costPoints * pointValue;
+    var advice = [];
+
+    if (roi !== null && roi < 1) {
+      advice.push("投入产出比 " + roi.toFixed(3) + "（低于 1 表示这批积分拿去抽奖，不如直接去商城换券），付费抽奖长期是亏的。");
+    } else if (roi !== null && roi >= 1.2) {
+      advice.push("投入产出比 " + roi.toFixed(3) + "，明显优于商城换券，可以放手投入。");
+    } else if (roi !== null) {
+      advice.push("投入产出比 " + roi.toFixed(3) + "，略优于商城但优势不厚，建议只用一半积分试探。");
+    }
+    if (freeDraws > 0) advice.push("你手上有 " + freeDraws + " 次零成本抽奖机会，无论期望值高低都该抽完。");
+
+    /* 压力情景：把积分全部投入 */
+    var stressEl = document.getElementById("stress");
+    var totalDraws = freeDraws + capacity;
+    if (capacity > 0 && pointValue > 0 && totalDraws > 0) {
+      var s = simulate(prizes, totalDraws, capacity, oppCostPerDraw);
+      if (s) {
+        var pct = (s.lossProbability * 100).toFixed(1);
+        var med = s.medianNet;
+        stressEl.style.display = "block";
+        stressEl.innerHTML =
+          "压力情景：把 " + Math.round(balance) + " 积分全部投入（" + totalDraws + " 次，成本约 " +
+          money(s.totalCost) + " 元）：<b>亏损概率 " + pct + "%</b>，净收益中位数 <b>" +
+          (med >= 0 ? "+" : "") + money(med) + " 元</b>，中大奖概率 " +
+          (s.grandHitProbability * 100).toFixed(2) + "%。<br>" +
+          "<span class='eq'>回测 " + s.trials + " 次 · 固定种子可复现</span>";
+        advice.push("若只按建议出手（" + (freeDraws + recommendedPaid) + " 次），可把最坏情况控制在中位净收益 " +
+          money(s.medianNet) + " 元附近。");
+      }
+    } else {
+      stressEl.style.display = "none";
+    }
+
+    if (probSum < 99.5 || probSum > 100.5) {
+      advice.push("注意：你填的概率合计为 " + probSum.toFixed(2) + "%（应为 100%），结果已按比例归一化，仅供参考。");
+    }
+
+    var ul = document.getElementById("advice");
+    ul.innerHTML = "";
+    for (i = 0; i < advice.length; i++) {
+      var li = document.createElement("li");
+      li.textContent = advice[i];
+      ul.appendChild(li);
+    }
+
+    document.getElementById("formula").textContent =
+      "单次期望 = Σ(概率 × 奖品价值) = " + money(evPerDraw) + " 元 ｜ 每积分期望 = " +
+      (valuePerPoint === null ? "—" : valuePerPoint.toFixed(5)) + " 元 ｜ 投入产出比 = 每积分期望 ÷ 商城每积分价值";
+
+    window.__share = "我算了算这套麦当劳抽奖：投入产出比只有 " + (roi === null ? "—" : roi.toFixed(3)) +
+      "，期望每 1000 积分只值 " + (valuePerPoint === null ? "—" : money(valuePerPoint * 1000)) +
+      " 元，商城能换 " + money(basis1000) + " 元。抽奖计算器：https://seven070707.github.io/mcd-points-hunter/";
+  }
+
+  /* ---------- 奖品 / 商品动态行 ---------- */
+
+  function prizeRow(name, value, prob) {
+    var d = document.createElement("div");
+    d.className = "prize-row";
+    d.innerHTML =
+      '<input class="p-name" type="text" value="">' +
+      '<input class="p-value" type="number" min="0" step="0.1" value="">' +
+      '<input class="p-prob" type="number" min="0" step="0.1" value="">' +
+      '<button class="del" type="button">×</button>';
+    d.querySelector(".p-name").value = name;
+    d.querySelector(".p-value").value = value;
+    d.querySelector(".p-prob").value = prob;
+    d.querySelector(".del").addEventListener("click", function () { d.remove(); calcLottery(); });
+    d.querySelectorAll("input").forEach(function (inp) {
+      inp.addEventListener("input", calcLottery);
+    });
+    return d;
+  }
+
+  function productRow(name, points, value) {
+    var d = document.createElement("div");
+    d.className = "prize-row";
+    d.innerHTML =
+      '<input class="g-name" type="text" value="">' +
+      '<input class="g-points" type="number" min="0" step="1" value="">' +
+      '<input class="g-value" type="number" min="0" step="1" value="">' +
+      '<button class="del" type="button">×</button>';
+    d.querySelector(".g-name").value = name;
+    d.querySelector(".g-points").value = points;
+    d.querySelector(".g-value").value = value;
+    d.querySelector(".del").addEventListener("click", function () { d.remove(); calcMall(); });
+    d.querySelectorAll("input").forEach(function (inp) {
+      inp.addEventListener("input", calcMall);
+    });
+    return d;
+  }
+
+  /* ---------- 商城比价 ---------- */
+
+  function calcMall() {
+    var rows = document.querySelectorAll("#products .prize-row");
+    var items = [];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var name = r.querySelector(".g-name").value || "未命名商品";
+      var pts = parseFloat(r.querySelector(".g-points").value) || 0;
+      var val = parseFloat(r.querySelector(".g-value").value) || 0;
+      if (pts <= 0 || val <= 0) continue;
+      items.push({ name: name, points: pts, value: val, per1000: val / pts * 1000 });
+    }
+
+    var tbody = document.querySelector("#mallTable tbody");
+    tbody.innerHTML = "";
+    var adviceEl = document.getElementById("mallAdvice");
+    adviceEl.innerHTML = "";
+
+    if (items.length < 2) {
+      document.getElementById("spread").textContent = "—";
+      return;
+    }
+
+    items.sort(function (a, b) { return b.per1000 - a.per1000; });
+    var best = items[0], worst = items[items.length - 1];
+    var spread = worst.per1000 > 0 ? best.per1000 / worst.per1000 : null;
+    document.getElementById("spread").textContent = spread === null ? "—" : spread.toFixed(2);
+
+    for (var k = 0; k < items.length; k++) {
+      var it = items[k];
+      var tr = document.createElement("tr");
+      if (k === 0) tr.className = "best";
+      if (k === items.length - 1 && items.length > 1) tr.className = "worst";
+      tr.innerHTML =
+        '<td class="rank">' + (k + 1) + '</td>' +
+        '<td></td>' +
+        '<td class="num">' + Math.round(it.points) + '</td>' +
+        '<td class="num">' + money(it.per1000) + ' 元</td>';
+      tr.children[1].textContent = it.name;
+      tbody.appendChild(tr);
+    }
+
+    var adv = [];
+    adv.push("最划算的是「" + best.name + "」：每 1000 积分能换 " + money(best.per1000) + " 元权益。");
+    if (spread && spread >= 1.5) {
+      adv.push("同一批商品里单位积分价值差 " + spread.toFixed(2) + " 倍 —— 随手挑一个，可能就亏掉一半积分。");
+    }
+    adv.push("最差的是「" + worst.name + "」，每 1000 积分只值 " + money(worst.per1000) + " 元。");
+    for (var j = 0; j < adv.length; j++) {
+      var li = document.createElement("li");
+      li.textContent = adv[j];
+      adviceEl.appendChild(li);
+    }
+
+    window.__mallBest = best.per1000;
+  }
+
+  /* ---------- 到期体检 ---------- */
+
+  function calcExpiry() {
+    var points = num(document.getElementById("expPoints"));
+    var dateStr = document.getElementById("expDate").value;
+    var basis1000 = num(document.getElementById("basis"));
+    var pointValue = basis1000 / 1000;
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    var target;
+    if (dateStr) {
+      var parts = dateStr.split("-");
+      target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+      target = new Date(today.getTime() + 6 * 86400000);
+    }
+
+    var days = Math.round((target - today) / 86400000);
+    var level, label;
+
+    if (days < 0) { level = "expired"; label = "已过期"; }
+    else if (days <= 7) { level = "critical"; label = "紧急"; }
+    else if (days <= 30) { level = "warning"; label = "警告"; }
+    else if (days <= 60) { level = "watch"; label = "关注"; }
+    else { level = "safe"; label = "安全"; }
+
+    document.getElementById("daysLeft").textContent = days;
+    var pill = document.getElementById("riskLabel");
+    pill.textContent = label;
+    pill.className = "pill " + (level === "critical" || level === "expired" ? "bad" : level === "warning" ? "mid" : "good");
+
+    var quota = days > 0 ? points / days : points;
+    document.getElementById("dailyQuota").textContent = Math.ceil(quota) + " 分";
+    document.getElementById("lossValue").textContent = money(points * pointValue) + " 元";
+    document.getElementById("riskShort").textContent = label;
+
+    var adv = [];
+    if (days < 0) {
+      adv.push("这批积分已经过期了。下次设置好提醒，别再让它白白作废。");
+    } else if (level === "critical") {
+      adv.push(days + " 天内必须消耗 " + Math.round(points) + " 积分，折算每天至少要用掉 " + Math.ceil(quota) + " 积分，否则直接作废。");
+      adv.push("按商城基准折算，这批积分的价值约 " + money(points * pointValue) + " 元 —— 相当于每天不花掉就损失 " + money(quota * pointValue) + " 元。");
+    } else if (level === "warning") {
+      adv.push("还有 " + days + " 天到期，建议本周内规划兑换：每天约 " + Math.ceil(quota) + " 积分。");
+    } else if (level === "watch") {
+      adv.push("还有 " + days + " 天，暂时不用慌，但可以开始留意商城好货。");
+    } else {
+      adv.push("有效期还很长，账户状态健康，按自己的节奏用就好。");
+    }
+
+    var ul = document.getElementById("expAdvice");
+    ul.innerHTML = "";
+    for (var i = 0; i < adv.length; i++) {
+      var li = document.createElement("li");
+      li.textContent = adv[i];
+      ul.appendChild(li);
+    }
+  }
+
+  /* ---------- 初始化 ---------- */
+
+  function init() {
+    var prizeData = [
+      ["巨无霸兑换券", 25, 0.3],
+      ["中薯条券", 12, 2],
+      ["甜筒券", 6, 8],
+      ["5 元现金券", 5, 22],
+      ["谢谢参与", 0, 67.7]
+    ];
+    var box = document.getElementById("prizes");
+    for (var i = 0; i < prizeData.length; i++) {
+      box.appendChild(prizeRow(prizeData[i][0], prizeData[i][1], prizeData[i][2]));
+    }
+
+    var prodData = [
+      ["10 元商品券", 1000, 10],
+      ["巨无霸兑换券", 1500, 25],
+      ["5 元现金券", 800, 5],
+      ["30 元券", 2500, 30],
+      ["小食兑换券", 1200, 8]
+    ];
+    var pbox = document.getElementById("products");
+    for (var j = 0; j < prodData.length; j++) {
+      pbox.appendChild(productRow(prodData[j][0], prodData[j][1], prodData[j][2]));
+    }
+
+    var d = new Date();
+    d.setDate(d.getDate() + 6);
+    var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+    var dd = ("0" + d.getDate()).slice(-2);
+    document.getElementById("expDate").value = d.getFullYear() + "-" + mm + "-" + dd;
+
+    ["cost", "balance", "free", "basis", "expPoints", "expDate"].forEach(function (id) {
+      document.getElementById(id).addEventListener("input", function () {
+        calcLottery();
+        calcExpiry();
+        calcMall();
+      });
+    });
+
+    document.getElementById("addPrize").addEventListener("click", function () {
+      document.getElementById("prizes").appendChild(prizeRow("新奖品", 0, 0));
+      calcLottery();
+    });
+    document.getElementById("addProduct").addEventListener("click", function () {
+      document.getElementById("products").appendChild(productRow("新商品", 1000, 10));
+      calcMall();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", function () {
+      var text = window.__share || "";
+      var btn = this;
+      function done() {
+        btn.textContent = "已复制 ✓";
+        setTimeout(function () { btn.textContent = "复制结论，发给朋友"; }, 1800);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+      } else {
+        fallback(text, done);
+      }
+    });
+
+    function fallback(text, cb) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); cb(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    calcLottery();
+    calcExpiry();
+    calcMall();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
