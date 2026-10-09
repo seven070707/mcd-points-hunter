@@ -1,0 +1,20 @@
+{
+  "_note": "示例数据，非真实活动。字段结构对齐麦当劳 MCP query-lottery-info 的返回结果，userResources 对应 query-my-account 的可用积分。概率之和为 1。",
+  "activityName": "麦麦积分抽奖（示例）",
+  "status": "active",
+  "dailyLimit": 50,
+  "costPerDraw": { "points": 100 },
+  "userResources": {
+    "availablePoints": 4280,
+    "remainingDraws": 1,
+    "tickets": 2
+  },
+  "prizes": [
+    { "name": "巨无霸汉堡免费券", "level": "grand", "probability": 0.001, "value": 25.5 },
+    { "name": "麦乐鸡 5 块券", "level": "normal", "probability": 0.02, "value": 12.0 },
+    { "name": "中杯可乐券", "level": "normal", "probability": 0.08, "value": 9.0 },
+    { "name": "5 元无门槛券", "level": "normal", "probability": 0.15, "value": 5.0 },
+    { "name": "积分 50 分返还", "level": "small", "probability": 0.3, "value": 0.5 },
+    { "name": "谢谢参与", "level": "none", "probability": 0.449, "value": 0.0 }
+  ]
+}

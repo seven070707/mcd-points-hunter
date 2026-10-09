@@ -1,0 +1,95 @@
+{
+  "_note": "示例数据，非真实商品。字段结构对齐麦当劳 MCP mall-points-products / mall-product-detail 的返回结果。",
+  "list": [
+    {
+      "productId": "MD-COLA-M",
+      "name": "中杯可乐免费兑换券",
+      "points": 300,
+      "faceValue": 9.0,
+      "validDays": 30,
+      "type": "virtual_coupon",
+      "stock": 99999
+    },
+    {
+      "productId": "MD-BIGMAC",
+      "name": "巨无霸汉堡免费兑换券",
+      "points": 800,
+      "faceValue": 25.5,
+      "validDays": 30,
+      "type": "virtual_coupon",
+      "stock": 50000
+    },
+    {
+      "productId": "MD-FRIES-L",
+      "name": "大薯条免费兑换券",
+      "points": 400,
+      "faceValue": 11.0,
+      "validDays": 30,
+      "type": "virtual_coupon",
+      "stock": 80000
+    },
+    {
+      "productId": "MD-NUGGET-5",
+      "name": "麦乐鸡 5 块免费兑换券",
+      "points": 500,
+      "faceValue": 12.0,
+      "validDays": 30,
+      "type": "virtual_coupon",
+      "stock": 60000
+    },
+    {
+      "productId": "MD-MCFLURRY",
+      "name": "麦旋风免费兑换券",
+      "points": 600,
+      "faceValue": 13.5,
+      "validDays": 30,
+      "type": "virtual_coupon",
+      "stock": 40000
+    },
+    {
+      "productId": "MD-LATTE",
+      "name": "麦咖啡拿铁免费兑换券",
+      "points": 700,
+      "faceValue": 18.0,
+      "validDays": 15,
+      "type": "virtual_coupon",
+      "stock": 20000
+    },
+    {
+      "productId": "MD-CASH-5",
+      "name": "5 元无门槛现金券",
+      "points": 500,
+      "faceValue": 5.0,
+      "validDays": 60,
+      "type": "virtual_coupon",
+      "stock": 99999
+    },
+    {
+      "productId": "MD-TUMBLER",
+      "name": "麦当劳限定保温杯（实物）",
+      "points": 3000,
+      "faceValue": 49.0,
+      "validDays": null,
+      "type": "physical",
+      "stock": 300
+    },
+    {
+      "productId": "MD-TOTEBAG",
+      "name": "联名帆布包（实物）",
+      "points": 2500,
+      "faceValue": 39.0,
+      "validDays": null,
+      "type": "physical",
+      "stock": 800
+    },
+    {
+      "productId": "MD-SPEAKER",
+      "name": "联名蓝牙音箱（实物）",
+      "points": 5000,
+      "faceValue": 89.0,
+      "validDays": null,
+      "type": "physical",
+      "stock": 120
+    }
+  ]
+}

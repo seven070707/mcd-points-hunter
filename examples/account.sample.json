@@ -1,0 +1,12 @@
+{
+  "_note": "示例数据，非真实账户。字段结构对齐麦当劳 MCP query-my-account 的返回结果。",
+  "availablePoints": 4280,
+  "totalPoints": 18650,
+  "frozenPoints": 0,
+  "expiringPoints": 1500,
+  "expiringDetails": [
+    { "points": 800, "expireDate": "2026-10-15" },
+    { "points": 400, "expireDate": "2026-11-02" },
+    { "points": 300, "expireDate": "2026-12-20" }
+  ]
+}
